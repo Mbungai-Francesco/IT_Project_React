@@ -66,7 +66,9 @@ export const deleteAdmin = async (id : number) => {
 
 export const loginUser = async (email : string, password : string) => {
   try{
-    const res = await axios.post(`${link}/${route}/login`, {email, password})    
+    const res = await axios.post(`${link}/${route}/login`, {email, password}) 
+    console.log(res);
+       
     return res.data as Admin
   }
   catch(error){

@@ -14,9 +14,12 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.22.13",
+    "@hookform/resolvers": "^5.0.1",
+    "@radix-ui/react-label": "^2.1.6",
+    "@radix-ui/react-slot": "^1.2.2",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/react-query": "^5.66.5",
-    "@tanstack/react-query-devtools": "^5.66.5",
+    "@tanstack/react-query-devtools": "^5.75.5",
     "@tanstack/react-router": "^1.114.3",
     "@tanstack/react-router-devtools": "^1.120.2",
     "@tanstack/router-plugin": "^1.114.3",
@@ -25,9 +28,11 @@
     "lucide-react": "^0.476.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.56.3",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.6",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.24.4"
   },
   "devDependencies": {
     "@tanstack/eslint-config": "^0.1.0",

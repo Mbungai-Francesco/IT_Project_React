@@ -1,14 +1,25 @@
 import { createFileRoute } from '@tanstack/react-router'
 import logo from '../logo.svg'
+import { useAdminContext } from '@/hooks/useAdminContext';
+import { setStoreAdmin } from '@/lib/localStore';
+import type { Admin } from '@/types';
+import { cn } from '@/lib/utils';
 
 export const Route = createFileRoute('/')({
   component: App,
 })
 
+// const defaultAdmin: Admin = { id: 1, name : 'Forche', email : '', password: '' }
+
 function App() {
+  const { admin , theme } = useAdminContext()
+
+  console.log(admin);
+  console.log(theme);
+  
   return (
-    <div className="text-center">
-      <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
+    <div className={cn(`text-center ${theme}`)}>
+      <header className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-[#282c34] text-white text-[calc(10px+2vmin)]">
         <img
           src={logo}
           className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"

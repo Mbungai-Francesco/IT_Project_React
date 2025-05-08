@@ -10,9 +10,9 @@ export default function Header() {
           <Link to="/">Home</Link>
         </div>
 
-        <div className="px-2 font-bold">
+        {/* <div className="px-2 font-bold">
           <Link to="/demo/clerk">Clerk</Link>
-        </div>
+        </div> */}
 
         <div className="px-2 font-bold">
           <Link to="/demo/tanstack-query">TanStack Query</Link>

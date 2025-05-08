@@ -11,11 +11,25 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as RegistrationImport } from './routes/registration'
+import { Route as HomeImport } from './routes/home'
 import { Route as IndexImport } from './routes/index'
 import { Route as DemoTanstackQueryImport } from './routes/demo.tanstack-query'
 import { Route as DemoClerkImport } from './routes/demo.clerk'
 
 // Create/Update Routes
+
+const RegistrationRoute = RegistrationImport.update({
+  id: '/registration',
+  path: '/registration',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const HomeRoute = HomeImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -46,6 +60,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeImport
+      parentRoute: typeof rootRoute
+    }
+    '/registration': {
+      id: '/registration'
+      path: '/registration'
+      fullPath: '/registration'
+      preLoaderRoute: typeof RegistrationImport
+      parentRoute: typeof rootRoute
+    }
     '/demo/clerk': {
       id: '/demo/clerk'
       path: '/demo/clerk'
@@ -67,12 +95,16 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/home': typeof HomeRoute
+  '/registration': typeof RegistrationRoute
   '/demo/clerk': typeof DemoClerkRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/home': typeof HomeRoute
+  '/registration': typeof RegistrationRoute
   '/demo/clerk': typeof DemoClerkRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
 }
@@ -80,27 +112,44 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/home': typeof HomeRoute
+  '/registration': typeof RegistrationRoute
   '/demo/clerk': typeof DemoClerkRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/demo/clerk' | '/demo/tanstack-query'
+  fullPaths:
+    | '/'
+    | '/home'
+    | '/registration'
+    | '/demo/clerk'
+    | '/demo/tanstack-query'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/demo/clerk' | '/demo/tanstack-query'
-  id: '__root__' | '/' | '/demo/clerk' | '/demo/tanstack-query'
+  to: '/' | '/home' | '/registration' | '/demo/clerk' | '/demo/tanstack-query'
+  id:
+    | '__root__'
+    | '/'
+    | '/home'
+    | '/registration'
+    | '/demo/clerk'
+    | '/demo/tanstack-query'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HomeRoute: typeof HomeRoute
+  RegistrationRoute: typeof RegistrationRoute
   DemoClerkRoute: typeof DemoClerkRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HomeRoute: HomeRoute,
+  RegistrationRoute: RegistrationRoute,
   DemoClerkRoute: DemoClerkRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
 }
@@ -116,12 +165,20 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/home",
+        "/registration",
         "/demo/clerk",
         "/demo/tanstack-query"
       ]
     },
     "/": {
       "filePath": "index.tsx"
+    },
+    "/home": {
+      "filePath": "home.tsx"
+    },
+    "/registration": {
+      "filePath": "registration.tsx"
     },
     "/demo/clerk": {
       "filePath": "demo.clerk.tsx"

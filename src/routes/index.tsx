@@ -1,13 +1,15 @@
 'use client'
 
 import { motion } from 'motion/react'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useAdminContext } from '@/hooks/useAdminContext'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { cn } from '@/lib/utils'
-import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { useMutation } from '@tanstack/react-query'
+import { loginUser } from '@/api/adminApi'
 import {
   Form,
   FormControl,
@@ -17,9 +19,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { useMutation } from '@tanstack/react-query'
-import { loginUser } from '@/api/adminApi'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -41,10 +40,11 @@ const formSchema = z.object({
 })
 
 function App() {
-  const { admin, theme } = useAdminContext()
+  const { theme } = useAdminContext()
+  const navigate = useNavigate()
 
-  console.log(admin)
-  console.log(theme)
+  // console.log(admin)
+  // console.log(theme)
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -59,21 +59,26 @@ function App() {
     return loginUser(values.email, values.password)
   }
 
-  const { isPending, mutate, isSuccess } = useMutation({
+  const { isPending, mutate } = useMutation({
     mutationFn: form.handleSubmit(onSubmit),
+    onSuccess: () => {
+      console.log('Login successful')
+      navigate({ to: '/home' })
+    },
   })
 
   return (
     <div className={cn(`${theme}`)}>
+      <title>Login</title>
       <main
         className={cn(
-          `bg-pink-600 dark:bg-black h-screen w-full flex flex-col justify-center items-center`,
+          `bg-white dark:bg-black min-h-screen w-full flex flex-col justify-center items-center`,
         )}
       >
         <Form {...form}>
           <form
             onSubmit={mutate}
-            className="space-y-8 dark:bg-black border-2 border-white rounded-md w-[35%] p-4 text-black dark:text-white"
+            className="space-y-8 dark:bg-black sm:border-2 sm:border-white rounded-md sm:w-[35%]  p-4 text-black dark:text-white"
           >
             <div className={cn(`text-center py-4`)}>
               <h1 className={cn(`font-bold text-2xl`)}>
@@ -118,19 +123,34 @@ function App() {
               className={cn(
                 `w-full rounded-md text-sm font-medium bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3`,
               )}
-              animate={isPending ? {
-                backgroundColor: ['#ffffff', '#ffa500', '#ffffff'], // Orange blink
-              } : {
-              }}
-              transition={isPending ? {
-                duration: 2, // Blink speed (3 seconds per cycle)
-                repeat: Infinity, // Loop forever
-                ease: 'linear',
-              } : {}}
+              animate={
+                isPending
+                  ? {
+                      backgroundColor: ['#ffffff', '#ffa500', '#ffffff'], // Orange blink
+                    }
+                  : {}
+              }
+              transition={
+                isPending
+                  ? {
+                      duration: 2, // Blink speed (3 seconds per cycle)
+                      repeat: Infinity, // Loop forever
+                      ease: 'linear',
+                    }
+                  : {}
+              }
             >
               Submit
             </motion.button>
-            <p className={cn(`font-medium`)}>I'm a candidate? <span className={cn(`text-blue-500 underline`)}>Registration</span></p>
+            <p className={cn(`font-medium`)}>
+              I'm a candidate?{' '}
+              <Link
+                to="/registration"
+                className={cn(`text-blue-500 underline cursor-pointer`)}
+              >
+                Registration
+              </Link>
+            </p>
           </form>
         </Form>
       </main>

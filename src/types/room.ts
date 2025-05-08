@@ -1,4 +1,4 @@
-import { Registration } from "./registration";
+import type { Registration } from "./registration";
 
 export interface Room {
   id: number;

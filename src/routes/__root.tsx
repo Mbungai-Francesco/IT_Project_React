@@ -6,7 +6,6 @@ import Header from '../components/Header'
 // import ClerkProvider from '../integrations/clerk/provider'
 
 import TanstackQueryLayout from '../integrations/tanstack-query/layout'
-
 import type { QueryClient } from '@tanstack/react-query'
 import { useAdminContext } from '@/hooks/useAdminContext'
 
@@ -25,7 +24,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
         <Outlet />
         <TanStackRouterDevtools />
-
         <TanstackQueryLayout />
         {/* </ClerkProvider> */}
       </>

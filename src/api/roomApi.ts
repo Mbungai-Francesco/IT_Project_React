@@ -43,7 +43,7 @@ export const updateRoom = async (id: number, room: Room) => {
     return res.data as Room;
   } catch (error) {
     console.error('Error:', error);
-    return null;
+    throw new Error("Room update failed")
   }
 };
 

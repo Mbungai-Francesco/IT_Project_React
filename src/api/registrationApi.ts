@@ -10,7 +10,7 @@ export const createRegistration = async (registration: Registration) => {
     return res.data as Registration;
   } catch (error) {
     console.error('Error:', error);
-    return null;
+    throw new Error("Creation failed")
   }
 };
 
@@ -21,7 +21,7 @@ export const getRegistrations = async () => {
     return res.data as Registration[];
   } catch (error) {
     console.error('Error:', error);
-    return null;
+    throw new Error("Get failed")
   }
 };
 

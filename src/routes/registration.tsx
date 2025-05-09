@@ -1,14 +1,14 @@
 import { useAdminContext } from '@/hooks/useAdminContext'
 import { cn } from '@/lib/utils'
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,8 +24,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import type { Room } from '@/types'
-import { getRooms } from '@/api/roomApi'
+import type { Registration, Room } from '@/types'
+import { getRooms, updateRoom } from '@/api/roomApi'
+import { createRegistration } from '@/api/registrationApi'
+import { uploadToCloudinary } from '@/api'
 
 export const Route = createFileRoute('/registration')({
   component: RouteComponent,
@@ -67,24 +69,23 @@ const formSchema = z.object({
         message: 'You must be at least 12 years old.',
       },
     ),
-  image: z.instanceof(File).optional(),
+  image: z.instanceof(File),
   cni: z.string().min(10, {
     message: 'CNI must be at least 10 characters.',
   }),
-  birthCertificate: z
-    .instanceof(File, {
-      message: 'Please upload birth certificate',
-    })
-    .optional(),
+  birthCertificate: z.instanceof(File, {
+    message: 'Please upload birth certificate',
+  }),
   roomOrBus: z.string().optional(),
   roomType: z.number().optional(),
-  paidRoom: z.number({
-    message: "paidRoom is required when roomType is provided",
-  }).optional(),
+  paidRoom: z
+    .number({
+      message: 'paidRoom is required when roomType is provided',
+    })
+    .optional(),
   paidBus: z.number().optional(),
   roomId: z.number().optional(),
-  status: z.string().optional(),
-});
+})
 
 const emptyRoom: Room = {
   id: 0,
@@ -94,11 +95,14 @@ const emptyRoom: Room = {
   price: 0,
 }
 
+const emptyFile = new File([], 'empty.txt', { type: 'text/plain' })
+
+// ? setting type
+type FormValues = z.infer<typeof formSchema>
+
 function RouteComponent() {
-  const [image, setImage] = useState<File | undefined>(undefined)
-  const [birthCertificate, setBirthCertificate] = useState<File | undefined>(
-    undefined,
-  )
+  const [image, setImage] = useState('')
+  const [birthCertificate, setBirthCertificate] = useState('')
   const [roomType, setRoomType] = useState(0)
   const [room, setRoom] = useState<Room>(emptyRoom)
   const [roomOrBus, setRoomOrBus] = useState('')
@@ -106,19 +110,15 @@ function RouteComponent() {
 
   const navigate = useNavigate()
   const { theme } = useAdminContext()
-  const {
-    isLoading,
-    data: rooms,
-    isFetched,
-  } = useQuery({
+  const { data: rooms } = useQuery({
     queryKey: ['rooms'],
     queryFn: () => getRooms(),
     staleTime: 30000, // 30 seconds
   })
 
   const roomById = (id: number) => {
-    form.setValue("roomId",id)
-    form.setValue("paidBus",0)
+    form.setValue('roomId', id)
+    form.setValue('paidBus', 0)
     if (rooms) return rooms.find((val) => val.id == id) || emptyRoom
     else return emptyRoom
   }
@@ -127,8 +127,8 @@ function RouteComponent() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      image: image,
-      birthCertificate: birthCertificate,
+      // image: image,
+      // birthCertificate: birthCertificate,
       roomType: 0,
       paidRoom: 0,
       paidBus: 0,
@@ -137,19 +137,177 @@ function RouteComponent() {
   })
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: FormValues) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
+    // imageMutate(values.image)
+    // fileMutate(values.birthCertificate)
+
     console.log(values)
+    mutate(values)
   }
 
-  const { isPending, mutate } = useMutation({
-    mutationFn: form.handleSubmit(onSubmit),
+  const { mutate: imageMutate, isSuccess: imageSuccess } = useMutation({
+    mutationFn: (val: File) => {
+      imageToast('Uplaoding', 'Image')
+      return uploadToCloudinary(val)
+    },
     onSuccess: () => {
-      console.log('Login successful')
-      // navigate({ to: '/home' })
+      toast.dismiss(toastImageId)
+      imageToast('Image Uploaded', '', 2000, 'green')
+    },
+    onError: () => {
+      toast.dismiss(toastImageId)
+      imageToast('Upload Failed', 'Image', 2000, 'red')
     },
   })
+  const { mutate: fileMutate, isSuccess: fileSuccess } = useMutation({
+    mutationFn: (val: File) => {
+      fileToast('Uplaoding', 'Certificate')
+      return uploadToCloudinary(val)
+    },
+    onSuccess: () => {
+      toast.dismiss(toastFileId)
+      fileToast('Certificate Uploaded', '', 2000, 'green')
+    },
+    onError: () => {
+      toast.dismiss(toastFileId)
+      fileToast('Upload Failed', 'Certificate', 2000, 'red')
+    },
+  })
+  const { mutate: roomMutate } = useMutation({
+    mutationFn: () =>{
+      const inRoom : Room ={
+        ...room,
+        studentId: data?.id || 0,
+        occupied: true
+      }
+      fileToast('Reserving', 'Room')
+      return updateRoom(inRoom.id, inRoom)
+    },
+    onSuccess: () => {
+      toast.dismiss(toastFileId)
+      fileToast('Room reserved', '', 2000, 'green')
+    },
+    onError: () => {
+      toast.dismiss(toastFileId)
+      fileToast('Reservation Failed', '', 2000, 'red')
+    },
+  })
+
+  const { data, mutate } = useMutation({
+    mutationFn: (vals: FormValues) => {
+      const registrationData: Registration = {
+        ...vals,
+        image: image,
+        birthCertificate: birthCertificate,
+        status: 'PENDING',
+        dateOfBirth: new Date(vals.dateOfBirth), // Convert here
+        // Handle file uploads if needed
+      }
+      imageToast('Creating', 'candidate')
+      return createRegistration(registrationData)
+    },
+    onSuccess: () => {
+      toast.dismiss(toastImageId)
+      imageToast('Candidate created', '', 2000, 'green')
+      roomMutate()
+    },
+    onError: () => {
+      toast.dismiss(toastImageId)
+      imageToast('Creation Failed', 'Image', 2000, 'red')
+    },
+  })
+
+  let toastImageId: string | number
+  let toastFileId: string | number
+
+  const imageToast = (
+    val: string,
+    action?: string,
+    num?: number,
+    col?: string,
+  ) => {
+    toastImageId = toast(val, {
+      description: <p>{action}</p>,
+      action: {
+        label: num ? (
+          <span className="relative flex size-3">
+            <span
+              className={cn(
+                'absolute inline-flex h-full w-full rounded-full opacity-75',
+                col === 'red' && 'bg-red-400',
+                col === 'green' && 'bg-green-400',
+              )}
+            ></span>
+            <span
+              className={cn(
+                'relative inline-flex size-3 rounded-full bg-sky-500',
+                col === 'red' && 'bg-red-500',
+                col === 'green' && 'bg-green-500',
+              )}
+            ></span>
+          </span>
+        ) : (
+          <>
+            <span className="relative flex size-3">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span>
+              <span className="relative inline-flex size-3 rounded-full bg-sky-500"></span>
+            </span>
+          </>
+        ),
+        onClick: () => console.log('Undone'),
+      },
+      style: {
+        backgroundColor: 'black',
+        color: 'white',
+      },
+      duration: num ? num : Infinity,
+    })
+  }
+  const fileToast = (
+    val: string,
+    action?: string,
+    num?: number,
+    col?: string,
+  ) => {
+    toastFileId = toast(val, {
+      description: <p>{action}</p>,
+      action: {
+        label: num ? (
+          <span className="relative flex size-3">
+            <span
+              className={cn(
+                'absolute inline-flex h-full w-full rounded-full opacity-75',
+                col === 'red' && 'bg-red-400',
+                col === 'green' && 'bg-green-400',
+              )}
+            ></span>
+            <span
+              className={cn(
+                'relative inline-flex size-3 rounded-full bg-sky-500',
+                col === 'red' && 'bg-red-500',
+                col === 'green' && 'bg-green-500',
+              )}
+            ></span>
+          </span>
+        ) : (
+          <>
+            <span className="relative flex size-3">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span>
+              <span className="relative inline-flex size-3 rounded-full bg-sky-500"></span>
+            </span>
+          </>
+        ),
+        onClick: () => console.log('Undone'),
+      },
+      style: {
+        backgroundColor: 'black',
+        color: 'white',
+      },
+      duration: num ? num : Infinity,
+    })
+  }
 
   return (
     <div className={cn(`${theme}`)}>
@@ -162,9 +320,9 @@ function RouteComponent() {
         <Form {...form}>
           <form
             className="space-y-8 dark:bg-black sm:border-2 sm:border-white rounded-md sm:w-3/5  p-4 text-black dark:text-white"
-            onSubmit={mutate}
+            onSubmit={form.handleSubmit(onSubmit)}
           >
-            <h1 className={cn(`font-bold text-2xl py-4`)}>Registration form</h1>
+            <h1 className={cn(`font-bold text-2xl py-4`)}>Registration form</h1>{' '}
             <div className="grid sm:grid-cols-2 gap-4 ">
               {/* // ? First Name */}
               <FormField
@@ -179,7 +337,7 @@ function RouteComponent() {
                     <FormMessage />
                   </FormItem>
                 )}
-              /> 
+              />
               {/* // ? Last Name */}
               <FormField
                 control={form.control}
@@ -193,7 +351,7 @@ function RouteComponent() {
                     <FormMessage />
                   </FormItem>
                 )}
-              /> 
+              />
               {/* // ? Email */}
               <FormField
                 control={form.control}
@@ -207,7 +365,7 @@ function RouteComponent() {
                     <FormMessage />
                   </FormItem>
                 )}
-              /> 
+              />
               {/* // ? Specialty */}
               <FormField
                 control={form.control}
@@ -310,6 +468,7 @@ function RouteComponent() {
               ) : (
                 <></>
               )}
+              {/* // ? Date of birth */}
               <FormField
                 control={form.control}
                 name="dateOfBirth"
@@ -340,6 +499,7 @@ function RouteComponent() {
                   </FormItem>
                 )}
               />
+              {/* // ? CNI */}
               <FormField
                 control={form.control}
                 name="cni"
@@ -353,6 +513,7 @@ function RouteComponent() {
                   </FormItem>
                 )}
               />
+              {/* // ? Image */}
               <FormField
                 control={form.control}
                 name="image"
@@ -365,8 +526,8 @@ function RouteComponent() {
                         accept="image/*"
                         onChange={(e) => {
                           const file = e.target.files?.[0]
-                          setImage(file)
                           field.onChange(file)
+                          imageMutate(file || emptyFile)
                         }}
                       />
                     </FormControl>
@@ -374,6 +535,7 @@ function RouteComponent() {
                   </FormItem>
                 )}
               />
+              {/* // ? File */}
               <FormField
                 control={form.control}
                 name="birthCertificate"
@@ -386,8 +548,8 @@ function RouteComponent() {
                         accept=".pdf,.jpg,.png"
                         onChange={(e) => {
                           const file = e.target.files?.[0]
-                          setBirthCertificate(file)
                           field.onChange(file)
+                          fileMutate(file || emptyFile)
                         }}
                       />
                     </FormControl>
@@ -395,6 +557,7 @@ function RouteComponent() {
                   </FormItem>
                 )}
               />
+              {/* // ? Room or Bus */}
               <FormField
                 control={form.control}
                 name="roomOrBus"
@@ -425,6 +588,7 @@ function RouteComponent() {
                   </FormItem>
                 )}
               />
+              {/* // ? Paid Room */}
               {roomOrBus == 'bus' ? (
                 <FormField
                   control={form.control}
@@ -436,7 +600,7 @@ function RouteComponent() {
                         <Select
                           onValueChange={(val) => {
                             field.onChange(Number(val))
-                            form.setValue("roomId",0)
+                            form.setValue('roomId', 0)
                           }}
                           defaultValue={''}
                         >
@@ -460,6 +624,7 @@ function RouteComponent() {
               ) : (
                 <></>
               )}
+              {/* // ? Room Type */}
               {roomOrBus == 'room' ? (
                 <FormField
                   control={form.control}
@@ -495,7 +660,7 @@ function RouteComponent() {
               ) : (
                 <></>
               )}
-
+              {/* // ? Paid room */}
               {roomType ? (
                 <FormField
                   control={form.control}
@@ -538,14 +703,19 @@ function RouteComponent() {
                 <></>
               )}
             </div>
-            <motion.button
-              type="submit"
-              className={cn(
-                `w-full rounded-md text-sm font-medium bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3`,
-              )}
-            >
-              Submit
-            </motion.button>
+            <div>
+              <motion.button
+                type="submit"
+                className={cn(
+                  `w-full rounded-md text-sm font-medium bg-primary text-primary-foreground shadow-xs hover:bg-primary/90 h-9 px-4 py-2 has-[>svg]:px-3`,
+                  !(fileSuccess && imageSuccess) && 'opacity-30',
+                )}
+                disabled={!(fileSuccess && imageSuccess)}
+              >
+                Submit
+              </motion.button>
+              <p className={cn(`py-2 text-sm`)}>** Files need to be uploaded for submit to be enabled</p>
+            </div>
           </form>
         </Form>
       </main>

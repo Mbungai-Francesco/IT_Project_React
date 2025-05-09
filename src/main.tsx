@@ -10,6 +10,7 @@ import { routeTree } from './routeTree.gen'
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
 import { AdminProvider } from './context/adminContext.tsx'
+import { Toaster } from "@/components/ui/sonner"
 
 // Create a new router instance
 const router = createRouter({
@@ -39,6 +40,7 @@ if (rootElement && !rootElement.innerHTML) {
       <AdminProvider>
         <TanstackQuery.Provider>
           <RouterProvider router={router} />
+          <Toaster />
         </TanstackQuery.Provider>
       </AdminProvider>
     </StrictMode>,

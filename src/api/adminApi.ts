@@ -73,6 +73,6 @@ export const loginUser = async (email : string, password : string) => {
   }
   catch(error){
     console.error('Error:', error);
-    return null
+    throw new Error("Network response was not ok. Send help")
   }
 }

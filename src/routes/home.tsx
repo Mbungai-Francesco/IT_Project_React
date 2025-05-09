@@ -12,7 +12,7 @@ function RouteComponent() {
   return (
     <div className={cn(`${theme}`)}>
       <main className={cn(
-          `bg-white dark:bg-black h-screen w-full flex flex-col justify-center items-center`,
+          `bg-white dark:bg-black text-black dark:text-white h-screen w-full flex flex-col justify-center items-center`,
         )}>Hello "/home"!</main>
     </div>
   )

@@ -51,11 +51,22 @@ const formSchema = z.object({
   level: z.number().min(1, {
     message: 'Level must be at least 1.',
   }),
-  dateOfBirth: z.coerce
-    .date()
-    .max(new Date(new Date().setFullYear(new Date().getFullYear() - 12)), {
-      message: 'You must be at least 12 years old.',
-    }),
+  dateOfBirth: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, {
+      message: 'Date must be in the format YYYY-MM-DD',
+    })
+    .refine(
+      (date) => {
+        const now = new Date()
+        const dob = new Date(date)
+        const minAge = new Date(now.setFullYear(now.getFullYear() - 12))
+        return dob <= minAge
+      },
+      {
+        message: 'You must be at least 12 years old.',
+      },
+    ),
   image: z.instanceof(File).optional(),
   cni: z.string().min(10, {
     message: 'CNI must be at least 10 characters.',
@@ -66,12 +77,14 @@ const formSchema = z.object({
     })
     .optional(),
   roomOrBus: z.string().optional(),
-  roomType: z.number(),
-  paidRoom: z.number(),
-  paidBus: z.number(),
-  roomId: z.number(),
-  status: z.string(),
-})
+  roomType: z.number().optional(),
+  paidRoom: z.number({
+    message: "paidRoom is required when roomType is provided",
+  }).optional(),
+  paidBus: z.number().optional(),
+  roomId: z.number().optional(),
+  status: z.string().optional(),
+});
 
 const emptyRoom: Room = {
   id: 0,
@@ -89,6 +102,7 @@ function RouteComponent() {
   const [roomType, setRoomType] = useState(0)
   const [room, setRoom] = useState<Room>(emptyRoom)
   const [roomOrBus, setRoomOrBus] = useState('')
+  const [specialty, setSpecialty] = useState('')
 
   const navigate = useNavigate()
   const { theme } = useAdminContext()
@@ -103,6 +117,8 @@ function RouteComponent() {
   })
 
   const roomById = (id: number) => {
+    form.setValue("roomId",id)
+    form.setValue("paidBus",0)
     if (rooms) return rooms.find((val) => val.id == id) || emptyRoom
     else return emptyRoom
   }
@@ -115,6 +131,7 @@ function RouteComponent() {
       birthCertificate: birthCertificate,
       roomType: 0,
       paidRoom: 0,
+      paidBus: 0,
       roomOrBus: '',
     },
   })
@@ -134,7 +151,6 @@ function RouteComponent() {
     },
   })
 
-
   return (
     <div className={cn(`${theme}`)}>
       <title>Registration</title>
@@ -144,9 +160,13 @@ function RouteComponent() {
         )}
       >
         <Form {...form}>
-          <form className="space-y-8 dark:bg-black sm:border-2 sm:border-white rounded-md sm:w-3/5  p-4 text-black dark:text-white" onSubmit={mutate}>
+          <form
+            className="space-y-8 dark:bg-black sm:border-2 sm:border-white rounded-md sm:w-3/5  p-4 text-black dark:text-white"
+            onSubmit={mutate}
+          >
             <h1 className={cn(`font-bold text-2xl py-4`)}>Registration form</h1>
             <div className="grid sm:grid-cols-2 gap-4 ">
+              {/* // ? First Name */}
               <FormField
                 control={form.control}
                 name="firstName"
@@ -159,7 +179,8 @@ function RouteComponent() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> 
+              {/* // ? Last Name */}
               <FormField
                 control={form.control}
                 name="lastName"
@@ -172,7 +193,8 @@ function RouteComponent() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> 
+              {/* // ? Email */}
               <FormField
                 control={form.control}
                 name="email"
@@ -185,7 +207,8 @@ function RouteComponent() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> 
+              {/* // ? Specialty */}
               <FormField
                 control={form.control}
                 name="specialty"
@@ -194,7 +217,10 @@ function RouteComponent() {
                     <FormLabel>Specialty</FormLabel>
                     <FormControl>
                       <Select
-                        onValueChange={field.onChange}
+                        onValueChange={(val) => {
+                          field.onChange(val)
+                          setSpecialty(val)
+                        }}
                         defaultValue={field.value}
                       >
                         <FormControl>
@@ -218,43 +244,72 @@ function RouteComponent() {
                   </FormItem>
                 )}
               />
-              {/* <FormField
-                control={form.control}
-                name="language"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Language</FormLabel>
-                    <FormControl>
-                      <select className="w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm" {...field}>
-                        <option value="" disabled selected>Select language</option>
-                        <option value="english">English</option>
-                        <option value="french">French</option>
-                      </select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
-              <FormField
-                control={form.control}
-                name="level"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Level</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="1"
-                        {...field}
-                        onChange={(e) =>
-                          field.onChange(parseInt(e.target.value))
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {specialty ? (
+                <FormField
+                  control={form.control}
+                  name="level"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Level</FormLabel>
+                      <FormControl className="w-full">
+                        <Select
+                          onValueChange={(val) => {
+                            field.onChange(parseInt(val[2]))
+                          }}
+                          defaultValue={''}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Pick one" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem
+                              value={'TA1'}
+                              hidden={!(specialty == 'Tronc commun')}
+                            >
+                              Inge 1 Anglo
+                            </SelectItem>
+                            <SelectItem
+                              value={'TF1'}
+                              hidden={!(specialty == 'Tronc commun')}
+                            >
+                              Inge 1 Franco
+                            </SelectItem>
+                            <SelectItem
+                              value={'IA3'}
+                              hidden={!(specialty == 'ISI')}
+                            >
+                              Inge 3 ISI Anglo
+                            </SelectItem>
+                            <SelectItem
+                              value={'IF3'}
+                              hidden={!(specialty == 'ISI')}
+                            >
+                              Inge 3 ISI Franco
+                            </SelectItem>
+                            <SelectItem
+                              value={'SR3'}
+                              hidden={!(specialty == 'SRT')}
+                            >
+                              Inge 3 SRT
+                            </SelectItem>
+                            <SelectItem
+                              value={'GC3'}
+                              hidden={!(specialty == 'Genie Civil')}
+                            >
+                              Inge 3 Genie Civil
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : (
+                <></>
+              )}
               <FormField
                 control={form.control}
                 name="dateOfBirth"
@@ -265,12 +320,20 @@ function RouteComponent() {
                       <Input
                         type="date"
                         {...field}
-                        value={
-                          field.value instanceof Date
-                            ? field.value.toISOString().split('T')[0]
-                            : ''
-                        }
+                        value={field.value || ''} // Handles undefined/null
+                        onChange={(e) => {
+                          // Directly use the YYYY-MM-DD string value
+                          field.onChange(e.target.value)
+                        }}
                         className="w-full"
+                        max={(() => {
+                          // Calculate max date (12 years ago from today)
+                          const now = new Date()
+                          const minAgeDate = new Date(
+                            now.setFullYear(now.getFullYear() - 12),
+                          )
+                          return minAgeDate.toISOString().split('T')[0]
+                        })()}
                       />
                     </FormControl>
                     <FormMessage />
@@ -365,14 +428,17 @@ function RouteComponent() {
               {roomOrBus == 'bus' ? (
                 <FormField
                   control={form.control}
-                  name="roomOrBus"
+                  name="paidBus"
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormLabel>Pick up location</FormLabel>
                       <FormControl className="w-full">
                         <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
+                          onValueChange={(val) => {
+                            field.onChange(Number(val))
+                            form.setValue("roomId",0)
+                          }}
+                          defaultValue={''}
                         >
                           <FormControl>
                             <SelectTrigger className="w-full">
@@ -441,8 +507,8 @@ function RouteComponent() {
                         <Select
                           onValueChange={(val) => {
                             setRoom(roomById(Number(val)))
-                            console.log(room)
-                            field.onChange(Number(room.price))
+                            console.log(roomById(Number(val)))
+                            field.onChange(Number(roomById(Number(val)).price))
                           }}
                           defaultValue={'0'}
                         >

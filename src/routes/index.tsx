@@ -19,6 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -39,6 +40,9 @@ const formSchema = z.object({
   }),
 })
 
+// ? setting type
+type FormValues = z.infer<typeof formSchema>
+
 function App() {
   const { theme } = useAdminContext()
   const navigate = useNavigate()
@@ -52,19 +56,29 @@ function App() {
   })
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: FormValues) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     // console.log(values)
-    return loginUser(values.email, values.password)
+    mutate(values)
   }
 
-  const { isPending, mutate } = useMutation({
-    mutationFn: form.handleSubmit(onSubmit),
+  const { isPending, mutate, isError } = useMutation({
+    // mutationFn: ,
+    mutationFn: (values: FormValues) => {
+      return loginUser(values.email, values.password)
+    },
     onSuccess: () => {
-      console.log('Login successful')
+      console.log('Success !!')
       navigate({ to: '/home' })
     },
+    // onError: (error) => {
+    //   console.log('Login failed:', error);
+    //   // Optionally add error handling here
+    //   form.setError('root', {
+    //     message: 'Invalid credentials. Please try again.'
+    //   });
+    // }
   })
 
   return (
@@ -77,8 +91,8 @@ function App() {
       >
         <Form {...form}>
           <form
-            onSubmit={mutate}
-            className="space-y-8 dark:bg-black sm:border-2 sm:border-white rounded-md sm:w-[35%]  p-4 text-black dark:text-white"
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-8  dark:bg-black sm:border-2 sm:border-black dark:sm:border-white rounded-md sm:w-[35%]  p-4 text-black dark:text-white"
           >
             <div className={cn(`text-center py-4`)}>
               <h1 className={cn(`font-bold text-2xl`)}>
@@ -142,15 +156,24 @@ function App() {
             >
               Submit
             </motion.button>
-            <p className={cn(`font-medium`)}>
-              I'm a candidate?{' '}
-              <Link
-                to="/registration"
-                className={cn(`text-blue-500 underline cursor-pointer`)}
-              >
-                Registration
-              </Link>
-            </p>
+            <div>
+              <p className={cn(`font-medium`)}>
+                I'm a candidate?{' '}
+                <Link
+                  to="/registration"
+                  className={cn(`text-blue-500 underline cursor-pointer`)}
+                >
+                  Registration
+                </Link>
+              </p>
+              {isError ? (
+                <p className={cn(`font-medium text-red-400`)}>
+                  Wrong Credentials
+                </p>
+              ) : (
+                <></>
+              )}
+            </div>
           </form>
         </Form>
       </main>

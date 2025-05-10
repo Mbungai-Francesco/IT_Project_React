@@ -152,12 +152,14 @@ function RouteComponent() {
       imageToast('Uplaoding', 'Image')
       return uploadToCloudinary(val)
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setImage(data)
       toast.dismiss(toastImageId)
       imageToast('Image Uploaded', '', 2000, 'green')
     },
     onError: () => {
       toast.dismiss(toastImageId)
+      form.setValue("image",emptyFile)
       imageToast('Upload Failed', 'Image', 2000, 'red')
     },
   })
@@ -166,21 +168,23 @@ function RouteComponent() {
       fileToast('Uplaoding', 'Certificate')
       return uploadToCloudinary(val)
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      setBirthCertificate(data)
       toast.dismiss(toastFileId)
       fileToast('Certificate Uploaded', '', 2000, 'green')
     },
     onError: () => {
       toast.dismiss(toastFileId)
+      form.setValue("birthCertificate",emptyFile)
       fileToast('Upload Failed', 'Certificate', 2000, 'red')
     },
   })
   const { mutate: roomMutate } = useMutation({
-    mutationFn: () =>{
-      const inRoom : Room ={
+    mutationFn: () => {
+      const inRoom: Room = {
         ...room,
         studentId: data?.id || 0,
-        occupied: true
+        occupied: true,
       }
       fileToast('Reserving', 'Room')
       return updateRoom(inRoom.id, inRoom)
@@ -203,6 +207,7 @@ function RouteComponent() {
         birthCertificate: birthCertificate,
         status: 'PENDING',
         dateOfBirth: new Date(vals.dateOfBirth), // Convert here
+        roomId: room.id
         // Handle file uploads if needed
       }
       imageToast('Creating', 'candidate')
@@ -211,7 +216,7 @@ function RouteComponent() {
     onSuccess: () => {
       toast.dismiss(toastImageId)
       imageToast('Candidate created', '', 2000, 'green')
-      roomMutate()
+      if(room.id)roomMutate()
     },
     onError: () => {
       toast.dismiss(toastImageId)
@@ -221,6 +226,7 @@ function RouteComponent() {
 
   let toastImageId: string | number
   let toastFileId: string | number
+  let toastRoomId: string | number
 
   const imageToast = (
     val: string,
@@ -308,6 +314,49 @@ function RouteComponent() {
       duration: num ? num : Infinity,
     })
   }
+  const roomToast = (
+    val: string,
+    action?: string,
+    num?: number,
+    col?: string,
+  ) => {
+    toastRoomId = toast(val, {
+      description: <p>{action}</p>,
+      action: {
+        label: num ? (
+          <span className="relative flex size-3">
+            <span
+              className={cn(
+                'absolute inline-flex h-full w-full rounded-full opacity-75',
+                col === 'red' && 'bg-red-400',
+                col === 'green' && 'bg-green-400',
+              )}
+            ></span>
+            <span
+              className={cn(
+                'relative inline-flex size-3 rounded-full bg-sky-500',
+                col === 'red' && 'bg-red-500',
+                col === 'green' && 'bg-green-500',
+              )}
+            ></span>
+          </span>
+        ) : (
+          <>
+            <span className="relative flex size-3">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75"></span>
+              <span className="relative inline-flex size-3 rounded-full bg-sky-500"></span>
+            </span>
+          </>
+        ),
+        onClick: () => console.log('Undone'),
+      },
+      style: {
+        backgroundColor: 'black',
+        color: 'white',
+      },
+      duration: num ? num : Infinity,
+    })
+  }
 
   return (
     <div className={cn(`${theme}`)}>
@@ -318,9 +367,17 @@ function RouteComponent() {
         )}
       >
         <Form {...form}>
-          <form
+          <motion.form
             className="space-y-8 dark:bg-black sm:border-2 sm:border-white rounded-md sm:w-3/5  p-4 text-black dark:text-white"
             onSubmit={form.handleSubmit(onSubmit)}
+            initial={{ opacity: 0, scale: 0.7 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{
+              // type: 'inertia',
+              stiffness: 100,
+              damping: 10,
+              delay: 1,
+            }}
           >
             <h1 className={cn(`font-bold text-2xl py-4`)}>Registration form</h1>{' '}
             <div className="grid sm:grid-cols-2 gap-4 ">
@@ -402,6 +459,7 @@ function RouteComponent() {
                   </FormItem>
                 )}
               />
+              {/* // ? Level */}
               {specialty ? (
                 <FormField
                   control={form.control}
@@ -588,7 +646,7 @@ function RouteComponent() {
                   </FormItem>
                 )}
               />
-              {/* // ? Paid Room */}
+              {/* // ? Paid Bus */}
               {roomOrBus == 'bus' ? (
                 <FormField
                   control={form.control}
@@ -600,7 +658,11 @@ function RouteComponent() {
                         <Select
                           onValueChange={(val) => {
                             field.onChange(Number(val))
+                            if(room.id) roomToast('Room canceled', '', 2000, 'red')
                             form.setValue('roomId', 0)
+                            setRoom(emptyRoom)
+                            console.log(form.getValues().paidBus);
+                            
                           }}
                           defaultValue={''}
                         >
@@ -637,6 +699,8 @@ function RouteComponent() {
                           onValueChange={(value) => {
                             field.onChange(Number(value))
                             setRoomType(Number(value))
+                            if(form.getValues().paidBus) roomToast('Bus canceled', '', 2000, 'red')
+                            form.setValue("paidBus",0)
                           }}
                           defaultValue={''}
                         >
@@ -714,9 +778,11 @@ function RouteComponent() {
               >
                 Submit
               </motion.button>
-              <p className={cn(`py-2 text-sm`)}>** Files need to be uploaded for submit to be enabled</p>
+              <p className={cn(`py-2 text-sm`)}>
+                ** Files need to be uploaded for submit to be enabled
+              </p>
             </div>
-          </form>
+          </motion.form>
         </Form>
       </main>
     </div>

@@ -14,7 +14,7 @@ export const uploadToCloudinary = async (file: File) => {
   formData.append('upload_preset', 'mbungai');
   console.log(formData);
 
-  try {
+  try {    
     const res = await axios.post(
       `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`, // Replace 'df5uqnkgi' with your cloud name
       formData,
@@ -25,7 +25,7 @@ export const uploadToCloudinary = async (file: File) => {
       }
     );
     // this.newArtist.artistImage = response.data.secure_url; // Save the uploaded image URL
-    console.log('Image uploaded successfully:', res.data.secure_url);
+    // console.log('Image uploaded successfully:', res.data.secure_url);
     return res.data.secure_url as string
   } catch (error) {
     console.error('Error uploading image:', error);

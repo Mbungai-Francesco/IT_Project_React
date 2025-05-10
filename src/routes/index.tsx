@@ -90,9 +90,17 @@ function App() {
         )}
       >
         <Form {...form}>
-          <form
+          <motion.form
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-8  dark:bg-black sm:border-2 sm:border-black dark:sm:border-white rounded-md sm:w-[35%]  p-4 text-black dark:text-white"
+            initial={{ opacity: 0, scale: 0.7 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{
+              // type: 'inertia',
+              stiffness: 100,
+              damping: 10,
+              delay: 1,
+            }}
           >
             <div className={cn(`text-center py-4`)}>
               <h1 className={cn(`font-bold text-2xl`)}>
@@ -174,7 +182,7 @@ function App() {
                 <></>
               )}
             </div>
-          </form>
+          </motion.form>
         </Form>
       </main>
     </div>

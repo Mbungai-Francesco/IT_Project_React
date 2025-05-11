@@ -8,6 +8,7 @@ import Header from '../components/shared/Header'
 import TanstackQueryLayout from '../integrations/tanstack-query/layout'
 import type { QueryClient } from '@tanstack/react-query'
 import { useAdminContext } from '@/hooks/useAdminContext'
+import SideBar from '@/components/shared/SideBar'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -23,7 +24,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         {/* {admin.id ? <Header /> : <></>} */}
         <Header />
 
-        <Outlet />
+        <div className="flex">
+          <SideBar />
+          <div className='grow'>
+            <Outlet />
+          </div>
+        </div>
         <TanStackRouterDevtools />
         <TanstackQueryLayout />
         {/* </ClerkProvider> */}

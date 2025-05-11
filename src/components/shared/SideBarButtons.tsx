@@ -9,7 +9,6 @@ interface props {
 
 const SideBarButtons = ({ label, link }: props) => {
   const { theme, route } = useAdminContext()
-  console.log(route)
 
   return (
     <Link className={`${theme}`} to={link}>

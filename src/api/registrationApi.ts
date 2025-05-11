@@ -21,18 +21,18 @@ export const getRegistrations = async () => {
     return res.data as Registration[];
   } catch (error) {
     console.error('Error:', error);
-    throw new Error("Get failed")
+    throw new Error("Getting all registrations failed")
   }
 };
 
 export const getRegistration = async (id: number) => {
   try {
     const res = await axios.get(`${link}/${route}/${id}`);
-    console.log(res.data.data);
+    console.log(res.data);
     return res.data as Registration;
   } catch (error) {
     console.error('Error:', error);
-    return null;
+    throw new Error(`Getting #${id} registration failed`)
   }
 };
 

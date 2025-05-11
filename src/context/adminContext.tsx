@@ -24,7 +24,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [route, setRoute] = useState<string>('')
 
   useEffect(() => {
-    console.log(theme)
+    // console.log(theme)
     if (theme == null) {
       if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
         setTheme('dark')

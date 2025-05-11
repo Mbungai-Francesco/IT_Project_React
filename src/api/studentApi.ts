@@ -24,7 +24,7 @@ export const getStudents = async () => {
   }
   catch(error){
     console.error('Error:', error);
-    return null
+    throw new Error("Couldn't get students")
   }
 }
 

@@ -1,29 +1,8 @@
-import { useState, useEffect } from 'react';
 import { motion } from 'motion/react'
 import { useAdminContext } from '@/hooks/useAdminContext';
 
 const ThemeSwitch = () => {
   const { theme, setTheme } = useAdminContext()
-  // const [isDark, setIsDark] = useState(() => {
-  //   // Check for saved preference or system preference
-  //   if (typeof window !== 'undefined') {
-  //     const savedTheme = localStorage.getItem('theme');
-  //     if (savedTheme) return savedTheme === 'dark';
-  //     return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  //   }
-  //   return false;
-  // });
-
-  // useEffect(() => {
-  //   // Apply the theme class to the document
-  //   if (isDark) {
-  //     document.documentElement.classList.add('dark');
-  //     localStorage.setItem('theme', 'dark');
-  //   } else {
-  //     document.documentElement.classList.remove('dark');
-  //     localStorage.setItem('theme', 'light');
-  //   }
-  // }, [isDark]);
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
@@ -32,9 +11,7 @@ const ThemeSwitch = () => {
   return (
     <button
       onClick={toggleTheme}
-      className={`relative flex items-center w-14 h-8 rounded-full p-1 transition-colors duration-300 outline-0 ${
-        (theme == 'dark') ? 'bg-gray-700' : 'bg-black'
-      }`}
+      className={`relative flex items-center w-14 h-8 rounded-full p-1 transition-colors duration-300 outline-0 bg-gray-700 `}
       aria-label={`Switch to ${(theme == 'dark') ? 'light' : 'dark'} mode`}
     >
       {/* Sun and Moon Icons (optional) */}

@@ -368,7 +368,7 @@ function RouteComponent() {
       >
         <Form {...form}>
           <motion.form
-            className="space-y-8 dark:bg-black sm:border-2 sm:border-white rounded-md sm:w-3/5  p-4 text-black dark:text-white"
+            className="space-y-8 dark:bg-black sm:border-2 sm:dark:border-white sm:border-black rounded-md sm:w-3/5  p-4 text-black dark:text-white"
             onSubmit={form.handleSubmit(onSubmit)}
             initial={{ opacity: 0, scale: 0.7 }}
             whileInView={{ opacity: 1, scale: 1 }}

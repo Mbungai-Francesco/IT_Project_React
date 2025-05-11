@@ -7,6 +7,8 @@ interface AdminContextProps {
   setAdmin: React.Dispatch<React.SetStateAction<Admin>>
   theme: string | null
   setTheme: React.Dispatch<React.SetStateAction<string | null>>
+  route: string
+  setRoute: React.Dispatch<React.SetStateAction<string>>
 }
 
 export const AdminContext = createContext<AdminContextProps | undefined>(
@@ -19,6 +21,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
 
   const [admin, setAdmin] = useState(getAdmin())
   const [theme, setTheme] = useState<string | null>(storedTheme)
+  const [route, setRoute] = useState<string>('')
 
   useEffect(() => {
     console.log(theme)
@@ -35,7 +38,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   })
 
   return (
-    <AdminContext.Provider value={{ admin, setAdmin, theme, setTheme }}>
+    <AdminContext.Provider value={{ admin, setAdmin, theme, setTheme, route, setRoute }}>
       {children}
     </AdminContext.Provider>
   )

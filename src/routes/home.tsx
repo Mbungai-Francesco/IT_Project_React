@@ -1,13 +1,18 @@
 import { useAdminContext } from '@/hooks/useAdminContext'
 import { cn } from '@/lib/utils'
 import { createFileRoute } from '@tanstack/react-router'
+import { useEffect } from 'react'
 
 export const Route = createFileRoute('/home')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { theme } = useAdminContext()
+  const { theme, setRoute } = useAdminContext()
+  
+  useEffect(() =>{
+    setRoute('/home')
+  },[])
 
   return (
     <div className={cn(`${theme} w-full h-full`)}>

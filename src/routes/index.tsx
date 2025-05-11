@@ -19,13 +19,15 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { setStoreAdmin } from '@/lib/localStore'
+import type { Admin } from '@/types'
 
 export const Route = createFileRoute('/')({
   component: App,
 })
 
-// const defaultAdmin: Admin = { id: 1, name : 'Forche', email : '', password: '' }
+const defaultAdmin: Admin = { id: 0, name : '', email : '', password: '' }
 
 const formSchema = z.object({
   email: z
@@ -44,7 +46,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>
 
 function App() {
-  const { theme } = useAdminContext()
+  const { theme, setAdmin } = useAdminContext()
   const navigate = useNavigate()
 
   // console.log(admin)
@@ -68,8 +70,9 @@ function App() {
     mutationFn: (values: FormValues) => {
       return loginUser(values.email, values.password)
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       console.log('Success !!')
+      setStoreAdmin(data, setAdmin)
       navigate({ to: '/home' })
     },
     // onError: (error) => {
@@ -80,6 +83,11 @@ function App() {
     //   });
     // }
   })
+
+  useEffect(()=>{
+    setStoreAdmin(defaultAdmin,setAdmin)
+    localStorage.setItem("admin",JSON.stringify(defaultAdmin))
+  },[])
 
   return (
     <div className={cn(`${theme}`)}>

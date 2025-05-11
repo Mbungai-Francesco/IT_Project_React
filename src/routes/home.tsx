@@ -10,10 +10,10 @@ function RouteComponent() {
   const { theme } = useAdminContext()
 
   return (
-    <div className={cn(`${theme}`)}>
-      <main className={cn(
-          `bg-slate-100 dark:bg-black text-black dark:text-white h-screen w-full flex flex-col justify-center items-center`,
-        )}>Hello "/home"!</main>
+    <div className={cn(`${theme} w-full h-full`)}>
+      <div className={cn(
+          `h-full overflow-auto bg-slate-100 dark:bg-black text-black dark:text-white  flex flex-col justify-center items-center`,
+        )}>Hello "/home"!</div>
     </div>
   )
 }

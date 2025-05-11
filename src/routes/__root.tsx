@@ -20,19 +20,18 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
     return (
       <>
-        {/* <ClerkProvider> */}
-        {/* {admin.id ? <Header /> : <></>} */}
-        <Header />
+        <div className='h-screen flex flex-col'>
+          {admin.id ? <Header /> : <></>}
 
-        <div className="flex">
-          <SideBar />
-          <div className='grow'>
-            <Outlet />
+          <div className="flex grow">
+            {admin.id ? <SideBar /> : <></>}
+            <div className="flex-auto">
+              <Outlet />
+            </div>
           </div>
         </div>
-        <TanStackRouterDevtools />
+        <TanStackRouterDevtools position='top-left' />
         <TanstackQueryLayout />
-        {/* </ClerkProvider> */}
       </>
     )
   },

@@ -15,14 +15,6 @@ export default function Header() {
         <div className="px-2 font-bold">
           <Link to="/home">FYV Student Managment</Link>
         </div>
-
-        {/* <div className="px-2 font-bold">
-          <Link to="/demo/clerk">Clerk</Link>
-        </div> */}
-
-        {/* <div className="px-2 font-bold">
-          <Link to="/demo/tanstack-query">TanStack Query</Link>
-        </div> */}
       </nav>
 
       <div className='flex gap-2 items-center'>

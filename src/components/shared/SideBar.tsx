@@ -8,14 +8,17 @@ const SideBar = () => {
     <div className={cn(`${theme} w-[17%]`)}>
       <div
         className={cn(
-          `h-screen p-2 border-r-2 bg-white dark:bg-black border-gray-200 dark:border-gray-700 `,
+          `h-full p-2 border-r-2 bg-white dark:bg-black border-gray-200 dark:border-gray-700 flex flex-col justify-between`,
         )}
       >
         <div className="gap-2 flex flex-col">
-          <SideBarButtons label='Students' link='home'/>
+          <SideBarButtons label='Students' link='/home'/>
           <SideBarButtons label='Candidates' link='candidates'/>
           <SideBarButtons label='Subjects' link='Subjects'/>
           <SideBarButtons label='Rooms' link='rooms'/>
+        </div>
+        <div>
+          <SideBarButtons label='Logout' link='/'/>
         </div>
       </div>
     </div>

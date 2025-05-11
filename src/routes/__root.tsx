@@ -20,7 +20,8 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     return (
       <>
         {/* <ClerkProvider> */}
-        {admin.id ? <Header /> : <></>}
+        {/* {admin.id ? <Header /> : <></>} */}
+        <Header />
 
         <Outlet />
         <TanStackRouterDevtools />

@@ -41,11 +41,11 @@ export const getGrade = async (id: number) => {
 export const getGradesByStudMat = async (studentId: string) => {
   try {
     const res = await axios.get(`${link}/${route}/studentMat/${studentId}`);
-    console.log(res.data.data);
+    console.log(res.data);
     return res.data as Grade[];
   } catch (error) {
     console.error('Error:', error);
-    return null;
+    throw new Error(`Couldn't get the grades by student`)
   }
 };
 

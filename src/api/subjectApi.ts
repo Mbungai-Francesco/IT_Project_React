@@ -32,7 +32,7 @@ export const getSubjectsBySemester = async (semester : number) => {
     return res.data as Subject[];
   } catch (error) {
     console.error('Error:', error);
-    return null;
+    throw new Error(`Failed in getting subjects of semester ${semester}`)
   }
 };
 

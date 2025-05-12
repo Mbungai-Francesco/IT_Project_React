@@ -12,8 +12,9 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as RegistrationImport } from './routes/registration'
-import { Route as HomeImport } from './routes/home'
 import { Route as IndexImport } from './routes/index'
+import { Route as HomeIndexImport } from './routes/home/index'
+import { Route as HomeIdImport } from './routes/home/$id'
 import { Route as DemoTanstackQueryImport } from './routes/demo.tanstack-query'
 import { Route as DemoClerkImport } from './routes/demo.clerk'
 
@@ -25,15 +26,21 @@ const RegistrationRoute = RegistrationImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const HomeRoute = HomeImport.update({
-  id: '/home',
-  path: '/home',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const HomeIndexRoute = HomeIndexImport.update({
+  id: '/home/',
+  path: '/home/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const HomeIdRoute = HomeIdImport.update({
+  id: '/home/$id',
+  path: '/home/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -60,13 +67,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/home': {
-      id: '/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof HomeImport
-      parentRoute: typeof rootRoute
-    }
     '/registration': {
       id: '/registration'
       path: '/registration'
@@ -88,6 +88,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoTanstackQueryImport
       parentRoute: typeof rootRoute
     }
+    '/home/$id': {
+      id: '/home/$id'
+      path: '/home/$id'
+      fullPath: '/home/$id'
+      preLoaderRoute: typeof HomeIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/home/': {
+      id: '/home/'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -95,63 +109,76 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/home': typeof HomeRoute
   '/registration': typeof RegistrationRoute
   '/demo/clerk': typeof DemoClerkRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/home/$id': typeof HomeIdRoute
+  '/home': typeof HomeIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/home': typeof HomeRoute
   '/registration': typeof RegistrationRoute
   '/demo/clerk': typeof DemoClerkRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/home/$id': typeof HomeIdRoute
+  '/home': typeof HomeIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/home': typeof HomeRoute
   '/registration': typeof RegistrationRoute
   '/demo/clerk': typeof DemoClerkRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
+  '/home/$id': typeof HomeIdRoute
+  '/home/': typeof HomeIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/home'
     | '/registration'
     | '/demo/clerk'
     | '/demo/tanstack-query'
+    | '/home/$id'
+    | '/home'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home' | '/registration' | '/demo/clerk' | '/demo/tanstack-query'
+  to:
+    | '/'
+    | '/registration'
+    | '/demo/clerk'
+    | '/demo/tanstack-query'
+    | '/home/$id'
+    | '/home'
   id:
     | '__root__'
     | '/'
-    | '/home'
     | '/registration'
     | '/demo/clerk'
     | '/demo/tanstack-query'
+    | '/home/$id'
+    | '/home/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  HomeRoute: typeof HomeRoute
   RegistrationRoute: typeof RegistrationRoute
   DemoClerkRoute: typeof DemoClerkRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
+  HomeIdRoute: typeof HomeIdRoute
+  HomeIndexRoute: typeof HomeIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  HomeRoute: HomeRoute,
   RegistrationRoute: RegistrationRoute,
   DemoClerkRoute: DemoClerkRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
+  HomeIdRoute: HomeIdRoute,
+  HomeIndexRoute: HomeIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -165,17 +192,15 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/home",
         "/registration",
         "/demo/clerk",
-        "/demo/tanstack-query"
+        "/demo/tanstack-query",
+        "/home/$id",
+        "/home/"
       ]
     },
     "/": {
       "filePath": "index.tsx"
-    },
-    "/home": {
-      "filePath": "home.tsx"
     },
     "/registration": {
       "filePath": "registration.tsx"
@@ -185,6 +210,12 @@ export const routeTree = rootRoute
     },
     "/demo/tanstack-query": {
       "filePath": "demo.tanstack-query.tsx"
+    },
+    "/home/$id": {
+      "filePath": "home/$id.tsx"
+    },
+    "/home/": {
+      "filePath": "home/index.tsx"
     }
   }
 }

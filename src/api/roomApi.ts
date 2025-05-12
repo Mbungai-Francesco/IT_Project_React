@@ -32,7 +32,7 @@ export const getRoom = async (id: number) => {
     return res.data as Room;
   } catch (error) {
     console.error('Error:', error);
-    return null;
+    throw new Error(`Getting room ${id} failed`)
   }
 };
 

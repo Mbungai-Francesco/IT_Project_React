@@ -1,45 +1,45 @@
-import { getRegistration, getRegistrations } from '@/api/registrationApi'
+import { getRegistrations } from '@/api/registrationApi'
 import { getStudents } from '@/api/studentApi'
 import { useAdminContext } from '@/hooks/useAdminContext'
 import { cn } from '@/lib/utils'
 import type { Student } from '@/types'
 import { useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 
-export const Route = createFileRoute('/home')({
+export const Route = createFileRoute('/home/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
   const { theme, setRoute } = useAdminContext()
-  const [ studs, setStuds ] = useState<Student[]>([])
+  const [studs, setStuds] = useState<Student[]>([])
+  const navigate = useNavigate()
 
   useEffect(() => {
     setRoute('/home')
   }, [])
-  
+
   const { data } = useQuery({
     queryKey: ['students'],
-    queryFn: () => getStudents()
+    queryFn: () => getStudents(),
   })
 
-  const { data : res } = useQuery({
+  const { data: res } = useQuery({
     queryKey: ['registrations'],
-    queryFn: () => getRegistrations()
+    queryFn: () => getRegistrations(),
   })
-  
+
   useEffect(() => {
-    if(data && res){
-      data.forEach(val => {
-        res.forEach(resVal =>{
-          if(resVal.id == val.registrationId) val.registration = resVal
+    if (data && res) {
+      data.forEach((val) => {
+        res.forEach((resVal) => {
+          if (resVal.id == val.registrationId) val.registration = resVal
         })
-      });
+      })
       setStuds(data)
-      
     }
-  }, [res,data])
+  }, [res, data])
 
   return (
     <div className={cn(`${theme} w-full h-full`)}>
@@ -64,14 +64,17 @@ function RouteComponent() {
               </thead>
               <tbody>
                 {studs.map((student, idx) => (
-                    <tr key={student.matricule} className="hover:bg-gray-100 dark:hover:bg-gray-800">
+                  <tr
+                    key={student.matricule}
+                    className="hover:bg-gray-100 dark:hover:bg-gray-800"
+                    onClick={ ()=> navigate({to: student.matricule})}
+                  >
                     <td className="border-b p-2">{idx + 1}</td>
                     <td className="border-b p-2">
-                      
                       <img
-                      src={student.registration?.image}
-                      alt="student"
-                      className="h-10 w-10 rounded-full object-cover"
+                        src={student.registration?.image}
+                        alt="student"
+                        className="h-10 w-10 rounded-full object-cover"
                       />
                     </td>
                     <td className="border-b p-2">

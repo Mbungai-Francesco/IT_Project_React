@@ -1,4 +1,4 @@
-import { getRegistration } from '@/api/registrationApi'
+import { getRegistration, getRegistrations } from '@/api/registrationApi'
 import { getStudents } from '@/api/studentApi'
 import { useAdminContext } from '@/hooks/useAdminContext'
 import { cn } from '@/lib/utils'
@@ -23,26 +23,23 @@ function RouteComponent() {
     queryKey: ['students'],
     queryFn: () => getStudents()
   })
+
+  const { data : res } = useQuery({
+    queryKey: ['registrations'],
+    queryFn: () => getRegistrations()
+  })
   
   useEffect(() => {
-    if(data){
-      console.log(data);
-      
+    if(data && res){
       data.forEach(val => {
-        getRegistration(val.registrationId).then((res) => val.registration = res)
+        res.forEach(resVal =>{
+          if(resVal.id == val.registrationId) val.registration = resVal
+        })
       });
-      console.log(data);
+      setStuds(data)
       
-      // setStuds(data)
     }
-  }, [data])
-  // const { data } = useQuery({
-  //   queryKey: ['registrations'],
-  //   queryFn: (val : number) => getRegistration(val),
-  //   select : (data) =>{
-
-  //   }
-  // })
+  }, [res,data])
 
   return (
     <div className={cn(`${theme} w-full h-full`)}>
@@ -66,15 +63,15 @@ function RouteComponent() {
                 </tr>
               </thead>
               <tbody>
-                {data.map((student, idx) => (
-                  <tr key={student.matricule} className="hover:bg-gray-50">
+                {studs.map((student, idx) => (
+                    <tr key={student.matricule} className="hover:bg-gray-100 dark:hover:bg-gray-800">
                     <td className="border-b p-2">{idx + 1}</td>
                     <td className="border-b p-2">
                       
                       <img
-                        src={student.registration?.image}
-                        alt="student"
-                        className="h-10 w-10 rounded-full object-cover"
+                      src={student.registration?.image}
+                      alt="student"
+                      className="h-10 w-10 rounded-full object-cover"
                       />
                     </td>
                     <td className="border-b p-2">

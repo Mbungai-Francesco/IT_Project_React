@@ -66,7 +66,7 @@ function RouteComponent() {
                 {studs.map((student, idx) => (
                   <tr
                     key={student.matricule}
-                    className="hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
                     onClick={ ()=> navigate({to: student.matricule})}
                   >
                     <td className="border-b p-2">{idx + 1}</td>

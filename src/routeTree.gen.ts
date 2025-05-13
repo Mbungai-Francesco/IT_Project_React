@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as RegistrationImport } from './routes/registration'
 import { Route as IndexImport } from './routes/index'
 import { Route as HomeIndexImport } from './routes/home/index'
+import { Route as CandidatesIndexImport } from './routes/candidates/index'
 import { Route as HomeIdImport } from './routes/home/$id'
 import { Route as DemoTanstackQueryImport } from './routes/demo.tanstack-query'
 import { Route as DemoClerkImport } from './routes/demo.clerk'
@@ -35,6 +36,12 @@ const IndexRoute = IndexImport.update({
 const HomeIndexRoute = HomeIndexImport.update({
   id: '/home/',
   path: '/home/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CandidatesIndexRoute = CandidatesIndexImport.update({
+  id: '/candidates/',
+  path: '/candidates/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -95,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HomeIdImport
       parentRoute: typeof rootRoute
     }
+    '/candidates/': {
+      id: '/candidates/'
+      path: '/candidates'
+      fullPath: '/candidates'
+      preLoaderRoute: typeof CandidatesIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/home/': {
       id: '/home/'
       path: '/home'
@@ -113,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/demo/clerk': typeof DemoClerkRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/home/$id': typeof HomeIdRoute
+  '/candidates': typeof CandidatesIndexRoute
   '/home': typeof HomeIndexRoute
 }
 
@@ -122,6 +137,7 @@ export interface FileRoutesByTo {
   '/demo/clerk': typeof DemoClerkRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/home/$id': typeof HomeIdRoute
+  '/candidates': typeof CandidatesIndexRoute
   '/home': typeof HomeIndexRoute
 }
 
@@ -132,6 +148,7 @@ export interface FileRoutesById {
   '/demo/clerk': typeof DemoClerkRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/home/$id': typeof HomeIdRoute
+  '/candidates/': typeof CandidatesIndexRoute
   '/home/': typeof HomeIndexRoute
 }
 
@@ -143,6 +160,7 @@ export interface FileRouteTypes {
     | '/demo/clerk'
     | '/demo/tanstack-query'
     | '/home/$id'
+    | '/candidates'
     | '/home'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -151,6 +169,7 @@ export interface FileRouteTypes {
     | '/demo/clerk'
     | '/demo/tanstack-query'
     | '/home/$id'
+    | '/candidates'
     | '/home'
   id:
     | '__root__'
@@ -159,6 +178,7 @@ export interface FileRouteTypes {
     | '/demo/clerk'
     | '/demo/tanstack-query'
     | '/home/$id'
+    | '/candidates/'
     | '/home/'
   fileRoutesById: FileRoutesById
 }
@@ -169,6 +189,7 @@ export interface RootRouteChildren {
   DemoClerkRoute: typeof DemoClerkRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   HomeIdRoute: typeof HomeIdRoute
+  CandidatesIndexRoute: typeof CandidatesIndexRoute
   HomeIndexRoute: typeof HomeIndexRoute
 }
 
@@ -178,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoClerkRoute: DemoClerkRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   HomeIdRoute: HomeIdRoute,
+  CandidatesIndexRoute: CandidatesIndexRoute,
   HomeIndexRoute: HomeIndexRoute,
 }
 
@@ -196,6 +218,7 @@ export const routeTree = rootRoute
         "/demo/clerk",
         "/demo/tanstack-query",
         "/home/$id",
+        "/candidates/",
         "/home/"
       ]
     },
@@ -213,6 +236,9 @@ export const routeTree = rootRoute
     },
     "/home/$id": {
       "filePath": "home/$id.tsx"
+    },
+    "/candidates/": {
+      "filePath": "candidates/index.tsx"
     },
     "/home/": {
       "filePath": "home/index.tsx"

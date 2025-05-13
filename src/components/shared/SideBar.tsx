@@ -13,9 +13,9 @@ const SideBar = () => {
       >
         <div className="gap-2 flex flex-col">
           <SideBarButtons label='Students' link='/home'/>
-          <SideBarButtons label='Candidates' link='candidates'/>
-          <SideBarButtons label='Subjects' link='Subjects'/>
-          <SideBarButtons label='Rooms' link='rooms'/>
+          <SideBarButtons label='Candidates' link='/candidates'/>
+          <SideBarButtons label='Subjects' link='/subjects'/>
+          <SideBarButtons label='Rooms' link='/rooms'/>
         </div>
         <div>
           <SideBarButtons label='Logout' link='/'/>

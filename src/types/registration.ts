@@ -11,6 +11,6 @@ export interface Registration {
   birthCertificate: string;
   paidRoom?: number;
   paidBus?: number;
-  roomId?: number;
+  room_id?: string;
   status: string;
 }

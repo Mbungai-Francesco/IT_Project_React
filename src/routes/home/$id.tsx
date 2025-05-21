@@ -31,13 +31,17 @@ function RouteComponent() {
   const { isLoading, data } = useQuery({
     queryKey: ['stud'],
     queryFn: () => getStudent(id),
+    staleTime: Infinity,
+    refetchOnMount: 'always',
   })
   useEffect(() => {
     if (data) {
       getRegistration(data.registrationId).then((res) => {
         setRegistration(res)
-        if (res.roomId) {
-          getRoom(res.roomId).then((res) => setRoom(res))
+        // console.log(res)
+
+        if (Number(res.room_id)) {
+          getRoom(Number(res.room_id)).then((res) => setRoom(res))
         } else if (res.paidBus) {
           switch (res.paidBus) {
             case 150000:
@@ -54,6 +58,7 @@ function RouteComponent() {
       })
       getSubjectsBySemester(semester).then((res) => {
         setSubjects(res)
+
         getGradesByStudMat(data.matricule).then((res) => {
           setGrades(res)
           for (const grad of grades) {
@@ -66,7 +71,7 @@ function RouteComponent() {
         })
       })
     }
-  }, [isLoading])
+  }, [data])
 
   return (
     <div className={cn(`${theme} w-full h-full`)}>
@@ -78,42 +83,59 @@ function RouteComponent() {
             alt="student"
             className="h-10 w-10 rounded-full object-cover"
           />
-          <h1 className="font-semibold text-gray-800 my-4">{registration?.firstName.toUpperCase()}</h1>
+          <h1 className="font-semibold text-gray-800 my-4">
+            {registration?.firstName.toUpperCase()}
+          </h1>
           <div className="space-y-1 text-gray-600">
             <p>
-              <span className="font-semibold">Surname:</span> {registration?.lastName}
+              <span className="font-semibold">Surname:</span>{' '}
+              {registration?.lastName}
             </p>
             <p>
-              <span className="font-semibold">Email:</span> {registration?.email}
+              <span className="font-semibold">Email:</span>{' '}
+              {registration?.email}
             </p>
             <p>
-              <span className="font-semibold">Specialty:</span> {registration?.specialty}
+              <span className="font-semibold">Specialty:</span>{' '}
+              {registration?.specialty}
             </p>
             <p>
-              <span className="font-semibold">Level:</span> {registration?.level}
+              <span className="font-semibold">Level:</span>{' '}
+              {registration?.level}
             </p>
             <p>
-              <span className="font-semibold">Date of Birth:</span> 2003-10-02
+              <span className="font-semibold">Date of Birth:</span>{' '}
+              {registration?.dateOfBirth.toString()}
             </p>
             <p>
-              <span className="font-semibold">CNI:</span> ut8y9bo
+              <span className="font-semibold">CNI:</span> {registration?.cni}
             </p>
             <p>
-              <span className="font-semibold">Birth Certificate:</span> Qpen
+              <span className="font-semibold">Birth Certificate:</span>
+              <a href={registration?.birthCertificate} target="_blank">
+                {' '}
+                Open
+              </a>
             </p>
-            <p>
-              <span className="font-semibold">Paid Bus:</span> Vogt
-            </p>
+            {registration?.paidBus ? (
+              <p>
+                <span className="font-semibold">Paid Bus:</span> {location}
+              </p>
+            ) : (
+              <p>
+                <span className="font-semibold">Paid Room:</span> {room?.number}
+              </p>
+            )}
           </div>
         </div>
 
-        <div className="w-1/2 bg-white h-fit shadow-md p-2 rounded-sm border border-gray-300">
+        <div className="w-1/2 bg-white h-fit shadow-md py-2 px-4 rounded-sm border border-gray-300">
           {/* Subjects Section */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Subjects</h2>
+            <h2 className="font-semibold text-gray-800 my-4">Subjects</h2>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                {/* <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Subject
@@ -125,9 +147,29 @@ function RouteComponent() {
                       Grade
                     </th>
                   </tr>
-                </thead>
+                </thead> */}
                 <tbody className="bg-white divide-y divide-gray-200">
-                  <tr>
+                  {subjects.map((sub) => (
+                    <tr
+                      className="flex justify-between items-center px-2"
+                      key={sub.id}
+                    >
+                      <td className="whitespace-nowrap text-sm font-medium text-gray-900">
+                        {sub.name}
+                      </td>
+                      <td className="flex justify-between items-center gap-10 py-2">
+                        <td className="whitespace-nowrap text-sm text-gray-500">
+                          {sub.coef}
+                        </td>
+                        <td className="whitespace-nowrap text-sm text-gray-500">
+                          <div className="bg-green-700 hover:bg-green-800 py-2 px-3 rounded-sm text-white cursor-pointer">
+                            <p>Grade</p>
+                          </div>
+                        </td>
+                      </td>
+                    </tr>
+                  ))}
+                  {/* <tr>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       Software Design
                     </td>
@@ -148,7 +190,7 @@ function RouteComponent() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       Grade
                     </td>
-                  </tr>
+                  </tr> */}
                 </tbody>
               </table>
             </div>

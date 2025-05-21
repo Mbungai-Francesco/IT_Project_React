@@ -45,7 +45,7 @@ function RouteComponent() {
     <div className={cn(`${theme} w-full h-full`)}>
       <div
         className={cn(
-          `h-full overflow-auto bg-slate-100 dark:bg-black text-black dark:text-white p-2`,
+          `h-full overflow-auto bg-slate-100/50 dark:bg-black text-black dark:text-white p-2`,
         )}
       >
         <div className="p-6 bg-white rounded-lg shadow-md w-full dark:bg-black dark:border dark:border-gray-700">

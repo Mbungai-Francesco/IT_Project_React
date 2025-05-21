@@ -11,6 +11,7 @@ export const Route = createFileRoute('/candidates/')({
 
 function RouteComponent() {
   const { theme, setRoute } = useAdminContext()
+  
 
   useEffect(() => {
     setRoute('/candidates')
@@ -30,7 +31,7 @@ function RouteComponent() {
       >
         <div className="p-6 bg-white rounded-lg shadow-md w-full dark:bg-black dark:border dark:border-gray-700">
           <h1 className="text-lg font-semibold mb-4">
-            Registrations in system
+            Candidates in system
           </h1>
 
           {isFetched ? (
@@ -57,7 +58,7 @@ function RouteComponent() {
                           <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
                             <img
                               src={val.image}
-                              alt="student"
+                              alt="candidate"
                               className="h-10 w-10 rounded-full object-cover"
                             />
                           </div>
@@ -79,11 +80,11 @@ function RouteComponent() {
                         </td>
                         <td className="p-2 border-b">3</td>
                         {val.status == 'PENDING' ? (
-                          <td className="p-2 border-b space-x-2">
-                            <button className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm">
+                          <td className="p-2 border-b space-x-2 font-medium">
+                            <button className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm cursor-pointer">
                               Accept
                             </button>
-                            <button className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm">
+                            <button className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm cursor-pointer">
                               Deny
                             </button>
                           </td>

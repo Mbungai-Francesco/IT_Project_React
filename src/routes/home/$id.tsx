@@ -70,18 +70,98 @@ function RouteComponent() {
 
   return (
     <div className={cn(`${theme} w-full h-full`)}>
-      <div
-        className={cn(
-          `h-full overflow-auto bg-slate-100 dark:bg-black text-black dark:text-white p-2`,
-        )}
-      >
-        {isLoading ? (
-          <div>Loading...</div>
-        ) : (
-          <div>
-            {data?.email} {semester}
+      <div className="w-full p-6 flex justify-between h-full bg-slate-100/50 gap-2">
+        {/* Header Section */}
+        <div className="mb-8 w-1/2 bg-white h-fit shadow-md p-4 rounded-sm border border-gray-300">
+          <img
+            src={registration?.image}
+            alt="student"
+            className="h-10 w-10 rounded-full object-cover"
+          />
+          <h1 className="font-semibold text-gray-800 my-4">{registration?.firstName.toUpperCase()}</h1>
+          <div className="space-y-1 text-gray-600">
+            <p>
+              <span className="font-semibold">Surname:</span> {registration?.lastName}
+            </p>
+            <p>
+              <span className="font-semibold">Email:</span> {registration?.email}
+            </p>
+            <p>
+              <span className="font-semibold">Specialty:</span> {registration?.specialty}
+            </p>
+            <p>
+              <span className="font-semibold">Level:</span> {registration?.level}
+            </p>
+            <p>
+              <span className="font-semibold">Date of Birth:</span> 2003-10-02
+            </p>
+            <p>
+              <span className="font-semibold">CNI:</span> ut8y9bo
+            </p>
+            <p>
+              <span className="font-semibold">Birth Certificate:</span> Qpen
+            </p>
+            <p>
+              <span className="font-semibold">Paid Bus:</span> Vogt
+            </p>
           </div>
-        )}
+        </div>
+
+        <div className="w-1/2 bg-white h-fit shadow-md p-2 rounded-sm border border-gray-300">
+          {/* Subjects Section */}
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Subjects</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Subject
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Credit
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Grade
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      Software Design
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      5
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Grade
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      Mobile App Development
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      5
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Grade
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Grades Section */}
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Grades</h2>
+            <div className="p-4 rounded-lg">
+              <p className="text-gray-500 italic">No grades available yet</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )

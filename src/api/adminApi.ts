@@ -5,7 +5,6 @@ const route = "api/user"
 
 export const createAdmin = async (admin : Admin) => {
   try{
-    // console.log("Authorization Header:", config.headers); // Log the authorization header
     const res = await axios.post(`${link}/${route}`, admin)
     console.log("message", res.statusText);
     return res.data as Admin

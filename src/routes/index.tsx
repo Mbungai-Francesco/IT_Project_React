@@ -49,9 +49,6 @@ function App() {
   const { theme, setAdmin } = useAdminContext()
   const navigate = useNavigate()
 
-  // console.log(admin)
-  // console.log(theme)
-
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
